@@ -1,0 +1,109 @@
+# ─────────────────────────────────────────────────────────
+#  .cursorrules  —  Cursor AI build/playbook definition
+#  Project: Ticket-Hub MVP (web-only, mobile-responsive)
+#  Updated: 2025-06-11
+# ─────────────────────────────────────────────────────────
+
+# ── GLOBAL SETTINGS ──────────────────────────────────────
+meta:
+  default_package_manager: bun
+  runtime: node-20
+  github_actions: true
+  code_style:
+    eslint: true
+    prettier: true
+    max_warnings: 0
+  commit_convention: |
+    <type>: <subject>
+    
+    [skip ci] only if commit is docs-only
+    types = chore, feat, fix, refactor, test, docs, ci
+  pr_requirements:
+    - "All checks green (lint, unit, e2e, Lighthouse)."
+    - "Description references the phase + step (e.g. Phase 3.2)."
+    - "Success Gate screenshot or test run attached."
+
+# ── COMMAND SHORT-HANDS ──────────────────────────────────
+commands:
+  lint:  "bunx eslint . --max-warnings 0"
+  test:  "bun test"
+  e2e:   "bunx playwright test"
+  build: "bun run build:web"
+  lighthouse: "npm exec --yes @treosh/lighthouse-ci -- autorun"
+
+# ── PHASES & SUCCESS GATES ───────────────────────────────
+# Cursor will stop after a phase until all gates are green.
+phases:
+  - id: 0
+    name: "Repo & Toolchain Bootstrap"
+    checks:
+      - run: lint
+      - run: build
+  - id: 1
+    name: "Auth.js + Tenant Skeleton"
+    checks:
+      - run: test
+      - run: e2e
+  - id: 2
+    name: "Prisma Tenant Middleware"
+    checks:
+      - run: test
+  - id: 3
+    name: "WorkItem Core (Tickets / Tasks)"
+    checks:
+      - run: test
+      - run: e2e
+  - id: 4
+    name: "Website Pages Extension"
+    checks:
+      - run: test
+      - run: e2e
+  - id: 5
+    name: "Content Generation Pipeline"
+    checks:
+      - run: test
+      - run: e2e
+  - id: 6
+    name: "Dynamic Forms"
+    checks:
+      - run: test
+      - run: e2e
+  - id: 7
+    name: "Screen Recording Integration"
+    checks:
+      - run: e2e
+      - assert: "bundle-size-js < 250kB"
+  - id: 8
+    name: "Webhook Settings & Events"
+    checks:
+      - run: test
+      - run: e2e
+  - id: 9
+    name: "Feature Toggles"
+    checks:
+      - run: test
+  - id: 10
+    name: "Observability & Performance"
+    checks:
+      - run: lighthouse
+      - assert: "lighthouse.LCP < 2500"
+      - assert: "lighthouse.CLS < 0.10"
+
+# ── ASSERTION HELPERS (simple key: JS-expr) ──────────────
+assertions:
+  bundle-size-js: |
+    const fs = require('fs');
+    const size = fs.statSync('apps/web/.next/static/chunks/app.js').size;
+    module.exports = size;
+
+  lighthouse: |
+    const fs = require('fs');
+    module.exports = JSON.parse(fs.readFileSync('./.lighthouseci/manifest.json','utf8')).summary;
+
+# ── DEFAULT cursor instructions HEADER ─────────────────────────
+# Pre-pended to every instruction block sent to Cursor AI.
+prompt_header: |
+  You are an expert Full-Stack engineer. 
+  *Only* generate the code/tests/configs needed to satisfy the current phase/step.
+  Follow repository conventions in .cursorrules. 
+  Do not skip writing tests required by Success Gates.
