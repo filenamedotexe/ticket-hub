@@ -14,7 +14,7 @@
     "lint:fix": "bunx eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "bun test",
+    "test": "bun test test/",
     "e2e": "bunx playwright test",
     "lighthouse": "npm exec --yes @treosh/lighthouse-ci -- autorun",
     "prepare": "husky install"
@@ -29,16 +29,21 @@
     ]
   },
   "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/bcryptjs": "^3.0.0",
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.0.0",
-    "prettier": "^3.0.0",
     "husky": "^8.0.0",
-    "lint-staged": "^15.0.0"
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
   },
   "engines": {
     "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2"
   }
 }

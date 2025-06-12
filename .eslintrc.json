@@ -25,9 +25,9 @@
     ".next/",
     "dist/",
     "build/",
-    "public/sw.js",
-    "public/workbox-*.js",
-    "public/worker-*.js"
+    "apps/web/public/sw.js",
+    "apps/web/public/workbox-*.js",
+    "apps/web/public/worker-*.js"
   ],
   "overrides": [
     {
