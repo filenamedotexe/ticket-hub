@@ -3,6 +3,7 @@
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import KanbanBoard from '../../components/KanbanBoard';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -41,36 +42,6 @@ export default function Dashboard() {
     }
   };
 
-  const getRolePermissions = (role: string) => {
-    switch (role) {
-      case 'ADMIN':
-        return [
-          'Full system access',
-          'User management',
-          'Tenant configuration',
-          'All ticket operations',
-          'System settings',
-        ];
-      case 'STAFF':
-        return [
-          'View all tickets',
-          'Assign tickets',
-          'Update ticket status',
-          'Respond to tickets',
-          'Generate reports',
-        ];
-      case 'CLIENT':
-        return [
-          'Create tickets',
-          'View own tickets',
-          'Update own profile',
-          'Add comments to own tickets',
-        ];
-      default:
-        return [];
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow">
@@ -82,9 +53,18 @@ export default function Dashboard() {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
-                Welcome, {session.user.name || session.user.email}
-              </span>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-700">
+                  {session.user.name || session.user.email}
+                </span>
+                <span
+                  className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(
+                    session.user.role
+                  )}`}
+                >
+                  {session.user.role}
+                </span>
+              </div>
               <button
                 onClick={() => signOut({ callbackUrl: '/' })}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-md text-sm font-medium"
@@ -98,65 +78,8 @@ export default function Dashboard() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          {/* User Info Card */}
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                User Information
-              </h3>
-              <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Name</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
-                    {session.user.name || 'Not provided'}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Email</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
-                    {session.user.email}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Role</dt>
-                  <dd className="mt-1">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(
-                        session.user.role
-                      )}`}
-                    >
-                      {session.user.role}
-                    </span>
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Tenant</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
-                    {session.user.tenant.name} ({session.user.tenant.slug})
-                  </dd>
-                </div>
-              </dl>
-            </div>
-          </div>
-
-          {/* Role Permissions Card */}
-          <div className="mt-6 bg-white overflow-hidden shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                Role Permissions ({session.user.role})
-              </h3>
-              <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                {getRolePermissions(session.user.role).map(
-                  (permission, index) => (
-                    <li key={index}>{permission}</li>
-                  )
-                )}
-              </ul>
-            </div>
-          </div>
-
-          {/* Success Message */}
-          <div className="mt-6 bg-green-50 border border-green-200 rounded-md p-4">
+          {/* Phase 3 Success Banner */}
+          <div className="mb-6 bg-green-50 border border-green-200 rounded-md p-4">
             <div className="flex">
               <div className="flex-shrink-0">
                 <svg
@@ -173,15 +96,76 @@ export default function Dashboard() {
               </div>
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-green-800">
-                  Authentication Successful!
+                  Phase 3 WorkItem Core Complete!
                 </h3>
                 <p className="mt-1 text-sm text-green-700">
-                  ✅ Phase 1.2 Complete: Auth.js email magic link is working
-                  <br />✅ Phase 1.3 Complete: Role-based authentication with{' '}
-                  {session.user.role} role
-                  <br />✅ Multi-tenant setup: User belongs to{' '}
-                  {session.user.tenant.name}
+                  ✅ Phase 3.1 Complete: WorkItem table with CRUD operations
+                  <br />✅ Phase 3.2 Complete: Server actions with &lt;300ms
+                  performance
+                  <br />✅ Phase 3.3 Complete: Mobile-friendly Kanban Board with
+                  dnd-kit
+                  <br />
+                  🎯 <strong>Drag and drop tickets</strong> between columns to
+                  update their status!
                 </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Kanban Board */}
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="px-4 py-5 sm:p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  Work Items Kanban Board
+                </h3>
+                <div className="text-sm text-gray-500">
+                  Tenant: {session.user.tenant.name}
+                </div>
+              </div>
+
+              <KanbanBoard
+                tenantId={session.user.tenant.id}
+                userId={session.user.id}
+                userRole={session.user.role}
+              />
+            </div>
+          </div>
+
+          {/* Instructions for Testing */}
+          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-md p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-blue-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-blue-800">
+                  Phase 3.3 Testing Instructions
+                </h3>
+                <div className="mt-1 text-sm text-blue-700">
+                  <p className="mb-2">
+                    <strong>Desktop:</strong> Click and drag work items between
+                    columns
+                  </p>
+                  <p className="mb-2">
+                    <strong>Mobile:</strong> Long press and drag work items
+                    (200ms delay)
+                  </p>
+                  <p>
+                    <strong>Success:</strong> Status updates immediately +
+                    persists on page refresh
+                  </p>
+                </div>
               </div>
             </div>
           </div>

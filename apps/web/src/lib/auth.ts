@@ -75,7 +75,8 @@ export const authOptions: NextAuthOptions = {
             id: user.id,
             email: user.email,
             name: user.name,
-            role: user.role,
+            role: user.role as any,
+            tenantId: user.tenantId,
             tenant: {
               id: user.tenant.id,
               name: user.tenant.name,
@@ -92,8 +93,8 @@ export const authOptions: NextAuthOptions = {
     jwt: async ({ token, user }) => {
       if (user) {
         token.id = user.id;
-        token.role = user.role;
-        token.tenant = user.tenant;
+        token.role = (user as any).role;
+        token.tenant = (user as any).tenant;
       }
       return token;
     },

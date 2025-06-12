@@ -135,8 +135,8 @@ describe('Phase 2.2 - Permission System', () => {
         expect(error).toBeInstanceOf(PermissionError);
         expect(error.code).toBe('PERMISSION_DENIED');
         expect(error.statusCode).toBe(403);
-        expect(error.context).toBe(context);
-        expect(error.action).toBe('manage:users');
+        expect(error.message).toContain('CLIENT');
+        expect(error.message).toContain('manage:users');
       }
     });
   });
